@@ -5,9 +5,9 @@ In this tutorial, I will introduce how to upgrade your website from http to http
 
 # Contents
 - [Preparation](#Preparation)
-- [1. HTTPS with Perfect Forward Secrecy](#1.-HTTPS-with-Perfect-Forward-Secrecy)
-- [2. HTTPS with Self-signed Certificate](#2.-HTTPS-with-Self-signed-Certificate)
-- [3. Decrypt HTTPS Encryption](#3.-Decrypt-HTTPS-Encryption)
+- [1 - HTTPS with Perfect Forward Secrecy](#HTTPS-with-Perfect-Forward-Secrecy)
+- [2 - HTTPS with Self-signed Certificate](#HTTPS-with-Self-signed-Certificate)
+- [3 - Decrypt HTTPS Encryption](#Decrypt-HTTPS-Encryption)
 
 # Preparation
 Before getting started, you should prepare a web server to test. We can use nginx to set up a simple web server quickly.
@@ -27,7 +27,7 @@ systemctl restart nginx
 ### Visit http://localhost to see if nginx is work
 ![nginx.jpg](image/nginx.jpg)
 
-# 1. HTTPS with Perfect Forward Secrecy
+# HTTPS with Perfect Forward Secrecy
 > In this chapter, you will learn how to set up a web server supporting https with perfect forward secrecy. And we will use [Let's Encrypt](https://letsencrypt.org/) to get a free certificate for your web server.
 
 ## ACME Protocol
@@ -153,7 +153,7 @@ And when you visit http://linyj.nctu.me, you can see that Nginx redirect you to 
   - [2] [Implementing SSL Perfect Forward Secrecy in NGINX Web-Server](https://www.howtoforge.com/ssl-perfect-forward-secrecy-in-nginx-webserver)
   - [3] [Configuring Apache, Nginx, and OpenSSL for Forward Secrecy](https://blog.qualys.com/ssllabs/2013/08/05/configuring-apache-nginx-and-openssl-for-forward-secrecy)
 
-# 2. HTTPS with Self-signed Certificate
+# HTTPS with Self-signed Certificate
 > In the previous chapter, we have learned how to apply for a certificate for our own web server by using Let's Encrypt. This chapter will teach you how to use **openssl** genarate and use self-signed certificate to enable https on the web server.
 
 Before generate a self-signed certificate for your website, you need to create a Root CA by yourself, then use this Root CA to issue yourself a certificate for your website. So this tutorial will be divided to two parts: the first part is the tutorial for generating a Root CA certificate and the second part is the tutorial for generating a web server certificate. Finally, because this Root CA is created by yourself, you need to add the certificate of this Root CA to the browser so that the browser can trust the certificates issued by this Root CA.
@@ -204,7 +204,7 @@ openssl x509 -req -days 3650 -sha256 -extensions v3_req -CA RootCA.crt -CAkey Ro
 
     ![nginx-https.jpg](image/nginx-https.jpg)
 
-# 3. Decrypt HTTPS Encryption
+# Decrypt HTTPS Encryption
 
 > In this chapter, we will use mitmproxy to decrypt https traffic flow, and this tutorial will demo on Linux.
 
@@ -245,5 +245,13 @@ Visit http://mitm.it and follow the installation guide to install certificate
 Now, open the web browser and visit any website, mitmproxy will intercept the traffic and show the flow on its GUI
 
 ![mitmproxy-traffic.gif](image/mitmproxy-traffic.gif)
+
+You can type `?` to get the help about commands and interact with mitmproxy
+
+You also can use `mitmweb` to use web-based interface
+
+![mitmweb.jpg](image/mitmweb.jpg)
+
+By using mitmproxy, you can intercept a https packet, modify its content, then send the modified one to the server.
 
 For more information, please reference [mitmproxy documentation](https://docs.mitmproxy.org/stable/)
