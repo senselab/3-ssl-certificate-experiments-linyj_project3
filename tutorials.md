@@ -205,3 +205,45 @@ openssl x509 -req -days 3650 -sha256 -extensions v3_req -CA RootCA.crt -CAkey Ro
     ![nginx-https.jpg](image/nginx-https.jpg)
 
 # 3. Decrypt HTTPS Encryption
+
+> In this chapter, we will use mitmproxy to decrypt https traffic flow, and this tutorial will demo on Linux.
+
+### Step 1 - Install mitmproxy
+You can install mitmproxy from [here](https://mitmproxy.org/).
+
+### Step 2 - Run mitmproxy
+```bash
+mitmproxy
+```
+By default, mitmproxy will run a proxy server at http://127.0.0.1:8080.
+
+Or you also can assign a port by `-p` option
+```bash
+mitmproxy -p 12345 # the proxy server will listen on port 12345
+```
+
+Now you can see mitmproxy GUI from the terminal
+
+![mitmproxy-demo.jpg](image/mitmproxt-demo.jpg)
+
+### Step 3 - Set Proxy For The Browser (use Firefox as example)
+
+Firxfox -> Preferences -> General -> Network Settings
+
+![proxy-setting.jpg](image/proxy-setting.jpg)
+
+### Step 4 - Install mitmproxy Certificate
+
+To use mitmproxy to intercept https traffic, we need to install mitmproxy certificate on the web browser so that the connection can established successfully.
+
+Visit http://mitm.it and follow the installation guide to install certificate
+
+![mitmit.jpg](image/mitmit.jpg)
+
+### Step 5 - Start Your Works !
+
+Now, open the web browser and visit any website, mitmproxy will intercept the traffic and show the flow on its GUI
+
+![mitmproxy-traffic.gif](image/mitmproxy-traffic.gif)
+
+For more information, please reference [mitmproxy documentation](https://docs.mitmproxy.org/stable/)
