@@ -1,7 +1,7 @@
 NS Mini Project 3 SSL Certificate
 ===
 
-In this tutorial, I will introduce how to upgrade your website from http to https using 2 different method, [Let's Encrypt](https://letsencrypt.org/) or self-signed certificate.
+In this tutorial, I will introduce how to upgrade your website from http to https using 2 different method, [Let's Encrypt](https://letsencrypt.org/) or self-signed certificate. Then I will introduce how to use [mitmproxy](https://mitmproxy.org/) to intercept / decrypt a https connection.
 
 # Contents
 - [Preparation](#Preparation)
@@ -112,13 +112,13 @@ sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
     ssl_dhparam /etc/ssl/certs/dhparam.pem;
     ```
 
-- Edit `/etc/nginx/sites-available/default`
+- Edit the server block in `/etc/nginx/sites-available/default`
     - Comment the following 2 lines
         ```
         listen 80 default_server;
         listen [::]:80 default_server;
         ```
-    - Add rhe following lines
+    - Add the following lines
         ```
         listen 443 ssl http2 default_server;
         listen [::]:443 ssl http2 default_server;
@@ -158,39 +158,62 @@ And when you visit http://linyj.nctu.me, you can see that Nginx redirect you to 
 
 Before generate a self-signed certificate for your website, you need to create a Root CA by yourself, then use this Root CA to issue yourself a certificate for your website. So this tutorial will be divided to two parts: the first part is the tutorial for generating a Root CA certificate and the second part is the tutorial for generating a web server certificate. Finally, because this Root CA is created by yourself, you need to add the certificate of this Root CA to the browser so that the browser can trust the certificates issued by this Root CA.
 
-## Self-signed Root CA
-### Step 1 - Generate the private key of Root CA
+## Step 1 - Self-signed Root CA
+### Generate the private key of Root CA
 ```bash
 openssl genrsa -out RootCA.key 2048
 ```
 
-### Step 2 - Generate root certificate request file
+### Generate root certificate request file
 ```bash
 openssl req -new -key RootCA.key -out RootCA.req
 ```
 
-### Step 3 - Use the request file to generate the root certificate
+At this step, openssl will ask you to input the information about this certificate, like `Country name`, `Organization Name`, etc.
+
+### Use the request file to generate the root certificate
 ```bash
 openssl x509 -req -days 3650 -sha256 -extensions v3_ca -signkey RootCA.key -in RootCA.req -out RootCA.crt
 ```
 
-## Self-signed server certificate
-### Step 1 - Generate the private key of the server
+## Step 2 - Self-signed server certificate
+### Generate the private key of the server
 ```bash
 openssl genrsa -out ServerCert.key 2048
 ```
 
-### Step 2 - Generate the certificate reqeuest file
+### Generate the certificate reqeuest file
 ```bash
 openssl req -new -key ServerCert.key -out ServerCert.req
 ```
 
-### Step 3 - Generate the server certificate
+Again, it will ask you to input some information. And
+notice that `Common Name` field in the certificate must match the IP address or the domain name of your web server, otherwise the web browser will distrust your website.
+
+![common-name.jpg](image/common-name.jpg)
+
+### Generate the server certificate
 ```
 openssl x509 -req -days 3650 -sha256 -extensions v3_req -CA RootCA.crt -CAkey RootCA.key -CAcreateserial -in ServerCert.req -out ServerCert.crt
 ```
 
-## Add Root CA certificate to the browser (Use Firefox as example)
+## Step 4 - Configure Nginx
+Edit `/etc/nginx/sites-available/default` and add the following lines to the server block
+```bash
+# https need port 443 for ssl usage
+listen 443 ssl default_server;
+listen [::]:443 ssl default_server;
+ssl_certificate /path/to/ServerCert.crt;     # change the path to your own
+ssl_certificate_key /path/to/ServerCert.key; # change the path to your own
+```
+
+After modification, reload nginx
+```bash
+sudo nginx -t               # check if there is any error with your config file
+sudo systemctl reload nginx
+```
+
+## Step 5 - Add Root CA certificate to the browser (Use Firefox as example)
 
 - Firefox -> Preferences -> Privacy & Security -> View Certificates
 
